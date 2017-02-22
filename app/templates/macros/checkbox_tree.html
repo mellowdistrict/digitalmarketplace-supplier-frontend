@@ -1,0 +1,71 @@
+{% if hint %}
+  {% set answer_advice_id="input-" + name + "-answer-advice" %}
+{% endif %}
+{% if question_advice %}
+  {% set question_advice_id="input-" + name + "-question-advice" %}
+{% endif %}
+
+{% if error %}
+<div class="validation-wrapper">
+{% endif %}
+  <div class="question" id="{{ name }}">
+    <label for="input-{{ name }}">
+      <span class="question-heading">
+        {{ question }}
+      </span>
+      {% if error %}
+        <span class="validation-message">
+          {{ error }}
+        </span>
+      {% endif %}
+    </label>
+    {% if question_advice %}
+    <span class="question-advice" id="{{ question_advice_id }}">
+      {{ question_advice }}
+    </span>
+    {% endif %}
+    {% if hint %}
+    <span class="hint" id="{{ answer_advice_id }}">
+      {{ hint }}
+    </span>
+    {% endif %}
+
+      <div class="grid-row">
+        <div class="column-one-third">
+          <div class="categories-counter">
+            Select up to 10 categories.
+          </div>
+        </div>
+        <div class="column-two-thirds">
+          {% for category in options %}
+            <details>
+              <summary>
+                <h2 class="categories-heading">{{ category.label }}</h2>
+                <span class="categories-summary">{{ category.options|length }} categories</span>
+              </summary>
+              <div class="panel panel-border-narrow categories"> 
+                {# not sure what to do about values or errors #}
+                {# possibly errors are a top-level thing, actually #}
+                {# have to explicitly override the hint #}
+                {%
+                  with
+                  question='{}, {} categories'.format(category.label, category.options|length),
+                  hint=None,
+                  name=category.label|lower,
+                  value=None,
+                  options=category.options,
+                  type='checkbox',
+                  hidden='true',
+                  error=None
+                %}
+                  {% include "toolkit/forms/selection-buttons.html" %}
+                {% endwith %}
+              </div>
+            </details>
+          {% endfor %}
+        </div>
+      </div>
+  </div>
+{% if error %}
+</div>
+{% endif %}

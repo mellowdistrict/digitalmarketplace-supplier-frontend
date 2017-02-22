@@ -33,6 +33,11 @@
   {% endwith %}
 {% endblock %}
 
+{# TODO: This sucks #}
+{%- block column_class -%}
+  {{ 'column-one-whole' if section.slug == 'service-categories' else super() }}
+{%- endblock -%}
+
 {% block save_button %}
 
   {% if force_continue_button or (next_question and not force_return_to_summary) %}
