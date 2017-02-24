@@ -51,12 +51,13 @@
                   with
                   question='{}, {} categories'.format(category.label, category.options|length),
                   hint=None,
-                  name=category.label|lower,
-                  value=None,
+                  name=name,
+                  id='input-{}-{}'.format(name, category.label),
+                  value=value,
                   options=category.options,
                   type='checkbox',
                   hidden='true',
-                  error=None
+                  error=error
                 %}
                   {% include "toolkit/forms/selection-buttons.html" %}
                 {% endwith %}
