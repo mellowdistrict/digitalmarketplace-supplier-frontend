@@ -32,11 +32,11 @@
 
       <div class="grid-row">
         <div class="column-one-third">
-          <div class="categories-counter">
+          <div class="categories-counter js-stick-at-top-when-scrolling" id="counter">
             Select up to 10 categories.
           </div>
         </div>
-        <div class="column-two-thirds">
+        <div class="column-two-thirds" id="checkbox-tree">
           {% for category in options %}
             <details>
               <summary>
@@ -66,6 +66,8 @@
           {% endfor %}
         </div>
       </div>
+      {# used to mark the lowest point the counter should reach #}
+      <div class="js-footer"></div>
   </div>
 {% if error %}
 </div>

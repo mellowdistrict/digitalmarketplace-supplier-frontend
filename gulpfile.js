@@ -23,9 +23,15 @@ var govukTemplateAssetsFolder = govukTemplateFolder + '/assets';
 var govukTemplateLayoutsFolder = govukTemplateFolder + '/views/layouts';
 
 // JavaScript paths
-var jsSourceFile = assetsFolder + '/javascripts/application.js';
+var jsSourceFiles = [
+  assetsFolder + '/javascripts/application.js',
+  assetsFolder + '/javascripts/category-picker.js'
+];
 var jsDistributionFolder = staticFolder + '/javascripts';
-var jsDistributionFile = 'application.js';
+var jsDistributionFiles = [
+  'application.js',
+  'category-pickers.js'
+]
 
 // CSS paths
 var cssSourceGlob = assetsFolder + '/scss/application*.scss';
@@ -120,7 +126,7 @@ gulp.task('sass', function () {
 });
 
 gulp.task('js', function () {
-  var stream = gulp.src(jsSourceFile)
+  var stream = gulp.src(jsSourceFiles)
     .pipe(filelog('Compressing JavaScript files'))
     .pipe(include())
     .pipe(sourcemaps.init())
@@ -131,7 +137,7 @@ gulp.task('js', function () {
     .pipe(gulp.dest(jsDistributionFolder));
 
   stream.on('end', function () {
-    console.log('💾 Compressed JavaScript saved as ' + jsDistributionFolder + '/' + jsDistributionFile);
+    console.log('💾 Compressed JavaScript saved as ' + jsDistributionFolder + '/ ' + jsDistributionFiles.join(', '));
   });
 
   return stream;

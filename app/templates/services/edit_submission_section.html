@@ -68,3 +68,10 @@
 
 {% endblock %}
 {% block return_to_service_link %} {% endblock %}
+
+{%- block javascripts -%}
+  {# TODO: This sucks #}
+  {% if section.slug == 'service-categories' %}
+  <script type="text/javascript" src="{{ asset_fingerprinter.get_url('javascripts/category-picker.js') }}" /></script>
+  {% endif %}
+{% endblock %}
