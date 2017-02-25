@@ -22,15 +22,15 @@
 
     this._containers = []
     this._categories = _categories
-    this.saveLastState()
+    this.save_last_state()
   }
-  Categories.prototype.saveLastState = function () {
+  Categories.prototype.save_last_state = function () {
     this._lastState = $.extend(true, {}, this._categories)
   }
   Categories.prototype.tick_by_name = function (category_names) {
     var self = this
 
-    this.saveLastState()
+    this.save_last_state()
     $(this._categories).each(function () {
       var category = this
       var subcategories
@@ -79,43 +79,15 @@
     var diff = []
 
     oldState.each(function (idx) {
-      var oldCategory = newState[idx]
-      if (this.checked !== oldCategory.checked) {
-        diff.push(this)
+      var newCategory = newState[idx]
+      if (this.checked !== newCategory.checked) {
+        diff.push(newCategory)
       }
     })
     return diff
   }
   Categories.prototype.get_changes = function () {
-    return this.diff(this._categories, this._lastState)
-  }
-
-  // compile templates
-  var categoryPickerTemplates = {
-    'checkbox' : Hogan.compile([
-      '{{ indent }}<label for="{{ id }}" class="block-label block-label-loose selection-button-checkbox{{ classNames }}"{{ attributes }}>',
-      '{{ indent }}  <input type="checkbox" name="{{ name }}" value="true" id="{{ id }}"{{ checked }}>',
-      '{{ indent }}  {{ value }}',
-      '{{ indent }}</label>'
-    ].join('\n')),
-    'subcategories_sentence': Hogan.compile([
-      '{{ siblingSubcategoriesNum }} ',
-      '{{#actualSubcategoriesNum}}of {{ actualSubcategoriesNum }} {{/actualSubcategoriesNum}}',
-      '{{ pluralisedCategories }}',
-      '{{#checked}}, {{ checked }} selected{{/checked}}'
-    ].join('')),
-    'container': Hogan.compile([
-      '<details {{ open }} data-parent-category="{{ parent }}">',
-        '<summary>',
-          '<span class="summary">',
-            '{{ subcategories_sentence }}',
-          '</span>',
-        '</summary>',
-        '<div class="panel panel-border-narrow">',
-        '  {{{ subcategoriesHTML }}}',
-      '</details>'
-    ].join('\n')),
-    'heading': Hogan.compile('<h2 class={{ classNames }}>{{ value }}</h2>')
+    return this.diff(this._lastState, this._categories)
   }
 
   var categoryPicker = function () {
@@ -131,95 +103,6 @@
       }
     })
     var globalCategories = new Categories(categories_data) 
-
-    function toRefList (prop) {
-      if (this.props[prop].length > 0) {
-        return [''].concat(this.props[prop]).join(' ')
-      } else {
-        return ''
-      }
-    }
-
-    function Heading (props) {
-      this.props = Object.assign({}, props)
-      this.props.classNames = ['heading-small']
-      this.props.attributes = []
-    }
-    Heading.prototype.toRefList = toRefList
-    Heading.prototype.render = function () {
-      var self = this
-      return GOVUK.GDM.templates.category_picker.heading.render({
-        'classNames': self.toRefList('classNames'),
-        'value': self.props.value
-      })
-    }
-
-    function Checkbox (props) {
-      this.props = Object.assign({}, props)
-      this.props.classNames = []
-      this.props.attributes = []
-      this.indent = this.props.hasOwnProperty('indent') ? '  ' : ''
-    }
-    Checkbox.prototype.toRefList = toRefList
-    Checkbox.prototype.render = function () {
-      var result = []
-      var checked = ''
-      var checkboxGroup
-
-      if (this.props.checked) {
-        checked = ' checked="checked"'
-        this.props.classNames.push('selected')
-      }
-
-      // props for template
-      var context = {
-        'indent': this.indent,
-        'id': this.props.id,
-        'name': this.props.name,
-        'value': this.props.value,
-        'classNames': this.toRefList('classNames'),
-        'attributes': this.toRefList('attributes')
-      }
-
-      return GOVUK.GDM.templates.category_picker.checkbox.render(context)
-    }
-
-    function SubcategoryContainer (props) {
-      this.props = {}
-      this.props.parent = props.parent
-      this.props.subcategoriesHTML = props.subcategoriesHTML
-      this.props.actualSubcategoriesNum = props.actualSubcategoriesNum
-      this.props.siblingSubcategoriesNum = props.siblingSubcategoriesNum
-      this.props.open = props.open ? ' open' : ''
-      this.EOL = '\n'
-    }
-    SubcategoryContainer.prototype.render = function () {
-      function suffix (count) {
-        return (count > 1) ? 'subcategories' : 'subcategory'
-      }
-
-      var checked = $(globalCategories.get_children_for(this.props.parent))
-                      .filter(function () {
-                         return this.checked
-                      }).length || false
-
-      var sentence_context = {}
-      var actualSubcategoriesNum = (this.props.siblingSubcategoriesNum !== this.props.actualSubcategoriesNum) ? this.props.actualSubcategoriesNum : false
-
-      var subcategories_sentence = GOVUK.GDM.templates.category_picker.subcategories_sentence.render({
-        'siblingSubcategoriesNum': this.props.siblingSubcategoriesNum,
-        'actualSubcategoriesNum': this.props.actualSubcategoriesNum,
-        'pluralisedCategories': suffix(this.props.actualSubcategoriesNum),
-        'checked': checked
-      })
-
-      return GOVUK.GDM.templates.category_picker.container.render({
-        'open': this.props.open,
-        'parent': this.props.parent,
-        'subcategories_sentence': subcategories_sentence,
-        'subcategoriesHTML': this.props.subcategoriesHTML
-      })
-    }
 
     function setCounter () {
       var checked = globalCategories.get_checked().length
@@ -257,7 +140,11 @@
       var updatedCategories = globalCategories.get_changes()
 
       $(updatedCategories).each(function () {
-        root.document.getElementById(this.id).checked = this.checked
+        var $input = $('#' + this.id)
+        var action = (this.checked) ? 'addClass' : 'removeClass'
+
+        $input.attr('checked', this.checked)
+        $input.parent('label')[action]('selected')
       })
       setCounter()
     }
@@ -298,9 +185,6 @@
       }
     })
   }
-
-  root.GOVUK.GDM.templates = window.GOVUK.GDM.templates || {}
-  root.GOVUK.GDM.templates.category_picker = categoryPickerTemplates
 
   root.GOVUK.GDM.categoryPicker = categoryPicker
   categoryPicker()
