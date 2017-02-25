@@ -27,61 +27,6 @@
   Categories.prototype.saveLastState = function () {
     this._lastState = $.extend(true, {}, this._categories)
   }
-  Categories.prototype.set_container_of = function (category) {
-    this._containers.push({
-      'category': category.parent,
-      'open': false
-    })
-  }
-  Categories.prototype.get_container_for = function (category) {
-    var matches = $(this._containers).filter(function () {
-      return this.category === category.value
-    })
-    return (matches.length > 0) ? matches[0] : false
-  }
-  Categories.prototype.click_container_for = function (category) {
-    var container = this.get_container_for(category)
-    container.open = !container.open
-  }
-  Categories.prototype.open_container_for = function (category) {
-    var container = this.get_container_for(category)
-    container.open = true
-  }
-  Categories.prototype.get_by_name = function (category_names) {
-    return $(this._categories).filter(function () {
-      return $.inArray(this.value, category_names) !== -1
-    })
-  }
-  Categories.prototype.get_by_id = function (category_ids) {
-    return $(this._categories).filter(function () {
-      return $.inArray(this.id, category_ids) !== -1
-    })
-  }
-  Categories.prototype.tick_by_id = function (category_ids) {
-    var self = this
-
-    this.saveLastState()
-    $(this._categories).each(function () {
-      var category = this
-      var subcategories
-      if ($.inArray(category_ids, category.id) !== -1) {
-        category.checked = !category.checked
-        if (category.checked && category.parent) {
-          self.get_parent_for(category).checked = true
-        }
-        // if category is a parent and is now not checked
-        if ((!category.checked) && (category.parent === null)) {
-          subcategories = $(self.get_children_for(category.value)).each(function () {
-            var category = this
-            if (category.checked) {
-              self.tick_by_id([category.id])
-            }
-          })
-        }
-      }
-    })
-    this.updateDiff()
-  }
   Categories.prototype.tick_by_name = function (category_names) {
     var self = this
 
