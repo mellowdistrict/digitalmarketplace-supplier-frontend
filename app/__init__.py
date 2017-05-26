@@ -18,7 +18,6 @@ csrf = CsrfProtect()
 
 
 from app.main.helpers.services import parse_document_upload_time
-from app.main.helpers.frameworks import question_references
 
 
 def create_app(config_name):
@@ -71,7 +70,6 @@ def create_app(config_name):
         session.permanent = True
         session.modified = True
 
-    application.add_template_filter(question_references)
     application.add_template_filter(parse_document_upload_time)
 
     return application

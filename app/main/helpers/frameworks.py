@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import re
 from datetime import datetime
 
 from dmutils.formats import DATETIME_FORMAT
@@ -150,18 +149,6 @@ def return_supplier_framework_info_if_on_framework_or_abort(data_api_client, fra
         abort(404)
 
     return supplier_framework
-
-
-def question_references(data, get_question):
-    if not data:
-        return data
-    references = re.sub(
-        r"\[\[([^\]]+)\]\]",  # anything that looks like [[nameOfQuestion]]
-        lambda question_id: str(get_question(question_id.group(1))['number']),
-        data
-    )
-
-    return data.__class__(references)
 
 
 def get_frameworks_by_status(frameworks, status, extra_condition=False):

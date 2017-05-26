@@ -96,7 +96,7 @@
           field_headings_visible=False
         ) %}
           {% call summary.row() %}
-            {{ summary.field_name(question.label|question_references(section.get_question)) }}
+            {{ summary.field_name(question.label) }}
             {% if section.editable %}
               {% if framework.status == 'open' and section_errors %}
                 {% call summary.field() %}
