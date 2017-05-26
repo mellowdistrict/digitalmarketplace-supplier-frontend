@@ -405,7 +405,8 @@ def framework_supplier_declaration_overview(framework_slug):
         abort(410)
 
     try:
-        content = content_loader.get_manifest(framework_slug, 'declaration').filter(sf["declaration"])
+        content = content_loader.get_manifest(framework_slug, 'declaration')
+        content = content.filter(dict(sf["declaration"], **{'content': content}))
     except ContentNotFoundError:
         abort(404)
 
@@ -479,7 +480,8 @@ def framework_supplier_declaration_submit(framework_slug):
 def framework_supplier_declaration_edit(framework_slug, section_id):
     framework = get_framework(data_api_client, framework_slug, allowed_statuses=['open'])
 
-    content = content_loader.get_manifest(framework_slug, 'declaration').filter({})
+    content = content_loader.get_manifest(framework_slug, 'declaration')
+    content = content.filter({'content': content})
     status_code = 200
 
     # Get and check the current section.
