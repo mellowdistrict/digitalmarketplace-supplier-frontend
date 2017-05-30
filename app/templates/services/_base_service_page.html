@@ -65,6 +65,32 @@
         {% if section.summary_page_description %}
           {{ summary.description(section.summary_page_description) }}
         {% endif %}
+
+        <p>/////////////Start of table/////////////////<p>
+        {{ summary.open_table(
+          caption=section.name,
+          field_headings=[
+            "Service attribute name",
+            "Service attribute",
+            "Add or Edit"
+        ] if section.edit_questions else[
+            "Service attribute name",
+            "Service attribute",
+        ],
+          field_headings_visible=False
+        ) }}
+          {% for question in section.questions %}
+            {{ summary.row_open() }}
+              {{ summary.field_name(question.label) }}
+                {% if question.is_empty %}
+                {% else %}
+                  {{ summary[question.type](question.value, question.assurance) }}
+                {% endif %}
+            {{ summary.row_close() }}
+          {% endfor %}
+        {{ summary.close_table() }}
+        <p>////////////////End of table////////////////<p>
+
         {% call(question) summary.list_table(
           section.questions,
           caption=section.name,

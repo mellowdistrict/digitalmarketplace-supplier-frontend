@@ -48,6 +48,14 @@ def edit_service(service_id):
         abort(404)
     remove_requested = bool(request.args.get('remove_requested'))
 
+    for sections in content.summary(service):
+        print(">>>>sections", dir(sections))
+        print(">>>name", sections.name)
+        print ('>>>section questions', dir(sections.questions))
+        for question in sections.questions:
+            print ('label???', question.label)
+    #print dir(content.summary(service))
+
     return render_template(
         "services/service.html",
         service_id=service.get('id'),
