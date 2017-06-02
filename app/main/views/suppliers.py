@@ -444,3 +444,35 @@ def create_your_account_complete():
         "suppliers/create_your_account_complete.html",
         email_address=email_address
     ), 200
+
+
+@main.route('/<framework_slug>/opportunities-overview', methods=['GET'])
+@login_required
+def opportunities_overview(framework_slug):
+    try:
+        framework = data_api_client.get_framework(slug=framework_slug)['frameworks']
+        supplier_framework = data_api_client.get_supplier_framework_info(
+            supplier_id=current_user.supplier_id,
+            framework_slug=framework['slug']
+        )['frameworkInterest']
+    except APIError as e:
+        abort(e.status_code)
+    if not framework['framework'] == 'digital-outcomes-and-specialists':
+        abort(404)
+    if not supplier_framework['onFramework']:
+        abort(404)
+
+    opportunities = data_api_client.find_brief_responses(
+        supplier_id=current_user.supplier_id,
+        status='draft,submitted'
+    )['briefResponses']
+
+    started = [i for i in opportunities if i['status'] == 'draft']
+    completed = [i for i in opportunities if i['status'] == 'submitted']
+
+    return render_template(
+        "suppliers/opportunities_overview.html",
+        framework=framework,
+        started=started,
+        completed=completed
+    ), 200

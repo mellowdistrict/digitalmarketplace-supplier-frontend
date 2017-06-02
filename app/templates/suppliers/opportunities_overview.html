@@ -1,0 +1,80 @@
+{% extends "_base_page.html" %}
+{% import "toolkit/summary-table.html" as summary %}
+{% block page_title %}Opportunities Overview - Digital Marketplace{% endblock %}
+
+{% block breadcrumb %}
+  {%
+    with items = [
+    {
+        "link": "/",
+        "label": "Digital Marketplace"
+    }
+    ]
+  %}
+    {% include "toolkit/breadcrumb.html" %}
+  {% endwith %}
+{% endblock %}
+
+{% block main_content %}
+
+    <div class="grid-row">
+
+        <div class="column-two-thirds">
+            {% with
+                heading = 'Your {} opportunities'.format(framework.name)
+            %}
+            {% include 'toolkit/page-heading.html' %}
+            {% endwith %}
+        </div>
+    </div>
+
+  <p>
+    <a href={{ "/{}/opportunities".format(framework.framework) }}>
+      View opportunities
+    </a>
+  </p>
+
+{{ summary.heading("Started", id="started_opportunities") }}
+{% call(item) summary.list_table(
+    started,
+    caption="Started opportunities caption",
+    empty_message="You don’t have any started opportunities",
+    field_headings=[
+        "Opportunity",
+        "Application Date",
+        summary.hidden_field_heading("Remove")
+    ],
+    field_headings_visible=True
+) %}
+
+    {% call summary.row() %}
+        {% call summary.field() %}
+            <a href={{ "/{}/opportunities/{}".format(framework.framework, item.briefId) }}>{{ item.briefTitle }}</a>
+        {% endcall %}
+        {{ summary.text(item.createdAt|dateformat) }}
+    {% endcall %}
+{% endcall %}
+
+
+{{ summary.heading("Completed", id="completed_opportunities") }}
+{% call(item) summary.list_table(
+    completed,
+    caption="Completed opportunities caption",
+    empty_message="You don’t have any completed opportunities",
+    field_headings=[
+        "Opportunity",
+        "Application Date",
+        summary.hidden_field_heading("Remove")
+    ],
+    field_headings_visible=True
+) %}
+
+    {% call summary.row() %}
+        {% call summary.field() %}
+            <a href={{ "/{}/opportunities/{}".format(framework.framework, item.briefId) }}>{{ item.briefTitle }}</a>
+        {% endcall %}
+        {{ summary.text(item.createdAt|dateformat) }}
+    {% endcall %}
+{% endcall %}
+
+{% endblock %}
