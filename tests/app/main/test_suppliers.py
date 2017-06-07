@@ -1,6 +1,8 @@
 # coding=utf-8
 
 import mock
+from dmapiclient import APIError
+from flask import Response
 from flask import session
 from lxml import html
 
@@ -1531,3 +1533,114 @@ class TestCreateSupplier(BaseApplicationTest):
 
             assert res.status_code == 200
             assert 'An email has been sent to my-email@example.com' in res.get_data(as_text=True)
+
+
+@mock.patch('app.main.views.suppliers.data_api_client', autospec=True)
+class TestOpportunitiesOverview(BaseApplicationTest):
+
+    def setup(self):
+        self.framework_response = {
+            'frameworks': {'slug': 'digital-outcomes-and-specialists-2', 'framework': 'digital-outcomes-and-specialists'}
+        }
+        self.supplier_framework_response = {
+            'frameworkInterest': {'onFramework': True}
+        }
+        self.find_brief_responses_response = {'briefResponses': [
+            {
+                'availability': '27/09/2017',
+                'briefId': 4733,
+                'briefTitle': 'Hide and seek ninjas',
+                'createdAt': '2017-06-07T10:25:37.916393Z',
+                'essentialRequirements': [{'evidence': 'foo'}, {'evidence': 'bar'}],
+                'essentialRequirementsMet': True,
+                'id': 20211,
+                'links': {
+                    'brief': 'http://localhost:5000/briefs/4733',
+                    'self': 'http://localhost:5000/brief-responses/20211',
+                    'supplier': 'http://localhost:5000/suppliers/700079'
+                },
+                'niceToHaveRequirements': [
+                    {'evidence': 'sewe', 'yesNo': True},
+                    {'evidence': 'wefweffew', 'yesNo': True},
+                    {'evidence': 'ewfefwefw', 'yesNo': True}
+                ],
+                'respondToEmailAddress': 'foo@bar.com',
+                'status': 'submitted',
+                'submittedAt': '2017-06-07T10:26:21.538917Z',
+                'supplierId': 700079,
+                'supplierName': '2020 Delivery Ltd.'
+            }, {
+                'availability': '31/11/2020',
+                'briefId': 4704,
+                'briefTitle': 'Hide and seek ninjas',
+                'createdAt': '2017-06-07T10:37:46.370201Z',
+                'essentialRequirementsMet': True,
+                'id': 20212,
+                'links': {
+                    'brief': 'http://localhost:5000/briefs/4704',
+                    'self': 'http://localhost:5000/brief-responses/20212',
+                    'supplier': 'http://localhost:5000/suppliers/700079'
+                },
+                'status': 'draft',
+                'supplierId': 700079,
+                'supplierName': '2020 Delivery Ltd.'
+            }
+        ]}
+
+
+    def test_happy_path(self, data_api_client):
+        data_api_client.get_framework.return_value = self.framework_response
+        data_api_client.get_supplier_framework_info.return_value = self.supplier_framework_response
+        with self.client:
+            self.login()
+            resp = self.client.get('/suppliers/digital-outcomes-and-specialists-2/opportunities-overview')
+            assert resp.status_code == 200
+
+    def test_must_have_supplier_framework(self, data_api_client):
+        data_api_client.get_framework.side_effect = APIError(mock.Mock(status_code=404))
+        data_api_client.get_supplier_framework_info.return_value = self.supplier_framework_response
+        with self.client:
+            self.login()
+            resp = self.client.get('/suppliers/digital-outcomes-and-specialists-2/opportunities-overview')
+            assert resp.status_code == 404
+
+    def test_only_works_for_dos_to_view(self, data_api_client):
+        self.framework_response['frameworks'].update({'framework': 'g-cloud-9'})
+        data_api_client.get_framework.return_value = self.framework_response
+        data_api_client.get_supplier_framework_info.return_value = self.supplier_framework_response
+        with self.client:
+            self.login()
+            resp = self.client.get('/suppliers/digital-outcomes-and-specialists-2/opportunities-overview')
+            assert resp.status_code == 404
+
+    def test_must_be_on_framework_to_view(self, data_api_client):
+        data_api_client.get_framework.return_value = self.framework_response
+        self.supplier_framework_response['frameworkInterest'].update(
+            {'onFramework': False}
+        )
+        data_api_client.get_supplier_framework_info.return_value = self.supplier_framework_response
+        with self.client:
+            self.login()
+            resp = self.client.get('/suppliers/digital-outcomes-and-specialists-2/opportunities-overview')
+            assert resp.status_code == 404
+
+    def test_completed_list_of_opportunities(self, data_api_client):
+        data_api_client.get_framework.return_value = self.framework_response
+        data_api_client.get_supplier_framework_info.return_value = self.supplier_framework_response
+        data_api_client.find_brief_responses.return_value = self.find_brief_responses_response
+        with self.client:
+            self.login()
+            res = self.client.get('/suppliers/digital-outcomes-and-specialists-2/opportunities-overview')
+            assert res.status_code == 200
+            doc = html.fromstring(res.get_data(as_text=True))
+
+            first_table = doc.xpath(
+                '//table[@class="summary-item-body"]'
+            )
+
+            assert 'Completed opportunities' in first_table[0].xpath('caption/text()')[0].strip()
+
+            first_row = "".join(first_table[0].xpath('tbody/descendant::*/text()'))
+
+            assert 'Hide and seek ninjas' in first_row
+            assert 'Wednesday 7 June 2017' in first_row

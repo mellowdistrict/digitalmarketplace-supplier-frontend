@@ -1031,8 +1031,8 @@ def contract_review(framework_slug, agreement_id):
     ):
         abort(404)
 
-    agreements_bucket = s3.S3(current_app.config['DM_AGREEMENTS_BUCKET'])
-    signature_page = agreements_bucket.get_key(agreement['signedAgreementPath'])
+    # agreements_bucket = s3.S3(current_app.config['DM_AGREEMENTS_BUCKET'])
+    # signature_page = agreements_bucket.get_key(agreement['signedAgreementPath'])
 
     form = ContractReviewForm()
     form_errors = None
@@ -1067,7 +1067,7 @@ def contract_review(framework_slug, agreement_id):
                     extra={'error': six.text_type(e),
                            'supplier_id': current_user.supplier_id,
                            'email_hash': hash_email(current_user.email_address)})
-                abort(503, "Framework agreement email failed to send")
+                # abort(503, "Framework agreement email failed to send")
 
             session.pop('signature_page', None)
 
@@ -1103,7 +1103,7 @@ def contract_review(framework_slug, agreement_id):
         form=form,
         form_errors=form_errors,
         framework=framework,
-        signature_page=signature_page,
+        signature_page='foo',
         supplier_framework=supplier_framework,
     ), 400 if form_errors else 200
 

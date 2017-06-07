@@ -457,9 +457,7 @@ def opportunities_overview(framework_slug):
         )['frameworkInterest']
     except APIError as e:
         abort(e.status_code)
-    if not framework['framework'] == 'digital-outcomes-and-specialists':
-        abort(404)
-    if not supplier_framework['onFramework']:
+    if not (framework['framework'] == 'digital-outcomes-and-specialists' and supplier_framework['onFramework']):
         abort(404)
 
     opportunities = data_api_client.find_brief_responses(
@@ -467,12 +465,12 @@ def opportunities_overview(framework_slug):
         status='draft,submitted'
     )['briefResponses']
 
-    started = [i for i in opportunities if i['status'] == 'draft']
+    # started = [i for i in opportunities if i['status'] == 'draft']
     completed = [i for i in opportunities if i['status'] == 'submitted']
 
     return render_template(
         "suppliers/opportunities_overview.html",
         framework=framework,
-        started=started,
+        # started=started,
         completed=completed
     ), 200

@@ -8,6 +8,10 @@
     {
         "link": "/",
         "label": "Digital Marketplace"
+    },
+    {
+        "link": url_for(".dashboard"),
+        "label": "Your account"
     }
     ]
   %}
@@ -30,37 +34,38 @@
 
   <p>
     <a href={{ "/{}/opportunities".format(framework.framework) }}>
-      View opportunities
+      Search for other opportunities on the Digital Marketplace.
     </a>
   </p>
 
-{{ summary.heading("Started", id="started_opportunities") }}
-{% call(item) summary.list_table(
-    started,
-    caption="Started opportunities caption",
-    empty_message="You don’t have any started opportunities",
-    field_headings=[
-        "Opportunity",
-        "Application Date",
-        summary.hidden_field_heading("Remove")
-    ],
-    field_headings_visible=True
-) %}
+{#{{ summary.heading("Started", id="started_opportunities") }}#}
+{#{% call(item) summary.list_table(#}
+{#    started,#}
+{#    caption="Started opportunities caption",#}
+{#    empty_message="You don’t have any started opportunities",#}
+{#    field_headings=[#}
+{#        "Opportunity",#}
+{#        "Application Date",#}
+{#        summary.hidden_field_heading("Remove")#}
+{#    ],#}
+{#    field_headings_visible=True#}
+{#) %}#}
+{##}
+{#    {% call summary.row() %}#}
+{#        {% call summary.field() %}#}
+{#            <a href={{ "/{}/opportunities/{}".format(framework.framework, item.briefId) }}>{{ item.briefTitle }}</a>#}
+{#        {% endcall %}#}
+{#        {{ summary.text(item.createdAt|dateformat) }}#}
+{#        {{ summary.link("View application", url_for(".view_response_result", brief_id=item.briefId)) }}#}
+{#    {% endcall %}#}
+{#{% endcall %}#}
 
-    {% call summary.row() %}
-        {% call summary.field() %}
-            <a href={{ "/{}/opportunities/{}".format(framework.framework, item.briefId) }}>{{ item.briefTitle }}</a>
-        {% endcall %}
-        {{ summary.text(item.createdAt|dateformat) }}
-    {% endcall %}
-{% endcall %}
 
-
-{{ summary.heading("Completed", id="completed_opportunities") }}
+{{ summary.heading("Completed", id="completed-opportunities") }}
 {% call(item) summary.list_table(
     completed,
-    caption="Completed opportunities caption",
-    empty_message="You don’t have any completed opportunities",
+    caption="Completed opportunities",
+    empty_message="You haven’t applied to any opportunities",
     field_headings=[
         "Opportunity",
         "Application Date",
@@ -74,6 +79,7 @@
             <a href={{ "/{}/opportunities/{}".format(framework.framework, item.briefId) }}>{{ item.briefTitle }}</a>
         {% endcall %}
         {{ summary.text(item.createdAt|dateformat) }}
+        {{ summary.link("View application", url_for(".view_response_result", brief_id=item.briefId)) }}
     {% endcall %}
 {% endcall %}
 
