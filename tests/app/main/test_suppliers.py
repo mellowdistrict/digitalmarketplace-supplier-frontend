@@ -703,6 +703,8 @@ class TestSuppliersDashboard(BaseApplicationTest):
                 '//a[@class="browse-list-item-link"]/text()'
             )[0]
 
+    def test_opportunities_overview_link(self):
+        pass
 
 class TestSupplierDashboardLogin(BaseApplicationTest):
     @mock.patch("app.main.views.suppliers.data_api_client")

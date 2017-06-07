@@ -2,7 +2,7 @@
 
 {{ summary.heading("Current services") }}
 {% if frameworks.live %}
-  {{ summary.top_link('View', url_for('.list_services')) }}
+  {{ summary.top_link('View services', url_for('.list_services')) }}
 {% endif %}
 {% call(framework) summary.list_table(
   frameworks.live,
