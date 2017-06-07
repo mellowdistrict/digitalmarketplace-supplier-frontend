@@ -2,7 +2,6 @@
 
 import mock
 from dmapiclient import APIError
-from flask import Response
 from flask import session
 from lxml import html
 
@@ -705,6 +704,7 @@ class TestSuppliersDashboard(BaseApplicationTest):
 
     def test_opportunities_overview_link(self):
         pass
+
 
 class TestSupplierDashboardLogin(BaseApplicationTest):
     @mock.patch("app.main.views.suppliers.data_api_client")
@@ -1542,7 +1542,10 @@ class TestOpportunitiesOverview(BaseApplicationTest):
 
     def setup(self):
         self.framework_response = {
-            'frameworks': {'slug': 'digital-outcomes-and-specialists-2', 'framework': 'digital-outcomes-and-specialists'}
+            'frameworks': {
+                'slug': 'digital-outcomes-and-specialists-2',
+                'framework': 'digital-outcomes-and-specialists'
+            }
         }
         self.supplier_framework_response = {
             'frameworkInterest': {'onFramework': True}
@@ -1588,7 +1591,6 @@ class TestOpportunitiesOverview(BaseApplicationTest):
                 'supplierName': '2020 Delivery Ltd.'
             }
         ]}
-
 
     def test_happy_path(self, data_api_client):
         data_api_client.get_framework.return_value = self.framework_response
