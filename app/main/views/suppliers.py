@@ -462,12 +462,15 @@ def opportunities_overview(framework_slug):
 
     opportunities = data_api_client.find_brief_responses(
         supplier_id=current_user.supplier_id,
+        status='submitted,draft'
     )['briefResponses']
 
-
+    completed = [i for i in opportunities if i['status'] == 'submitted']
+    started = [i for i in opportunities if i['status'] == 'draft']
 
     return render_template(
         "suppliers/opportunities_overview.html",
         framework=framework,
-        completed=opportunities
+        completed=opportunities,
+        started=started
     ), 200
