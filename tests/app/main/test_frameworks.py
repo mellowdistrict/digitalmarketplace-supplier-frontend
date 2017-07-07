@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from collections import OrderedDict
 from itertools import chain
-
+from datetime import datetime, timedelta
 from dmapiclient import HTTPError
 from flask import request
 from werkzeug.datastructures import MultiDict
@@ -5820,8 +5820,7 @@ class TestOpportunitiesDashboard(BaseApplicationTest):
                     'frameworkSlug': 'digital-outcomes-and-specialists-2'
                 },
                 'status': 'submitted',
-            },
-            {
+            }, {
                 'briefId': 1829,
                 'brief': {
                     'title': 'Lowest date, submitted, mid id',
@@ -5830,8 +5829,7 @@ class TestOpportunitiesDashboard(BaseApplicationTest):
                     'frameworkSlug': 'digital-outcomes-and-specialists-2'
                 },
                 'status': 'submitted',
-            },
-            {
+            }, {
                 'briefId': 4734,
                 'brief': {
                     'title': 'Mid date, submitted, highest id',
@@ -5840,11 +5838,17 @@ class TestOpportunitiesDashboard(BaseApplicationTest):
                     'frameworkSlug': 'digital-outcomes-and-specialists-2'
                 },
                 'status': 'submitted',
-            },{
+            }, {
                 'briefId': 345,
                 'brief': {
                     'title': 'First, live, ends in 7 days',
                     'applicationsClosedAt': '2017-06-07T10:26:21.538917Z',
+                }
+            }, {
+                'briefId': 1,
+                'brief': {
+                    'title': 'First, live draft, ends in 2 days',
+                    'applicationsClosedAt': datetime.isoformat(datetime.now() + timedelta(days=2)) + 'Z',
                     'status': 'live',
                     'frameworkSlug': 'digital-outcomes-and-specialists-2'
                 },
@@ -5947,4 +5951,4 @@ class TestOpportunitiesDashboard(BaseApplicationTest):
 
     def test_started_opportunities_table(self, data_api_client):
         first_row = self.get_table_rows_by_id('draft-opportunities', data_api_client)[0]
-        assert 'First, live, ends in 7 days' in first_row
+        assert 'First, live draft, ends in 2 days' in first_row
