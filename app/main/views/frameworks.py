@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
+import six
 from collections import OrderedDict
 from itertools import chain
 
+from datetime import datetime
 from dateutil.parser import parse as date_parse
-from dmapiclient import HTTPError
-from flask import render_template, request, abort, flash, redirect, url_for, current_app, session
-from flask_login import current_user
-import flask_featureflags as feature
-import six
 
-from dmapiclient import APIError
+from flask import render_template, request, abort, flash, redirect, url_for, current_app, session
+import flask_featureflags as feature
+from flask_login import current_user
+
+from dmapiclient import APIError, HTTPError
 from dmapiclient.audit import AuditTypes
 from dmutils.email import send_email
 from dmutils.email.exceptions import EmailError
@@ -25,8 +26,7 @@ from dmutils.documents import (
     file_is_empty, file_is_image, file_is_pdf, sanitise_supplier_name
 )
 
-from ... import data_api_client, flask_featureflags
-from ...main import main, content_loader
+from ..forms.frameworks import SignerDetailsForm, ContractReviewForm, AcceptAgreementVariationForm, ReuseDeclarationForm
 from ..helpers import hash_email, login_required
 from ..helpers.frameworks import (
     get_declaration_status, get_last_modified_from_first_matching_file, register_interest_in_framework,
@@ -39,7 +39,9 @@ from ..helpers.validation import get_validator
 from ..helpers.services import (
     get_signed_document_url, get_drafts, get_lot_drafts, count_unanswered_questions
 )
-from ..forms.frameworks import SignerDetailsForm, ContractReviewForm, AcceptAgreementVariationForm, ReuseDeclarationForm
+from ... import data_api_client, flask_featureflags
+from ...main import main, content_loader
+
 
 CLARIFICATION_QUESTION_NAME = 'clarification_question'
 
@@ -1207,8 +1209,14 @@ def opportunities_dashboard(framework_slug):
         supplier_id=current_user.supplier_id, framework=framework_slug, status='submitted,draft'
     )['briefResponses']
 
-    draft_opportunities = [opportunity for opportunity in opportunities if opportunity["status"] == "draft"]
-    submitted_opportunities = [opportunity for opportunity in opportunities if opportunity["status"] == "submitted"]
+    draft_opportunities = filter(
+        lambda i: (
+            i["status"] == "draft" and
+            date_parse(i['brief']['applicationsClosedAt']).date() >= datetime.today().date()
+        ),
+        opportunities
+    )
+    submitted_opportunities = filter(lambda i: (i["status"] == "submitted"), opportunities)
 
     return render_template(
         "suppliers/opportunities_dashboard.html",
