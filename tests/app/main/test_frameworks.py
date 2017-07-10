@@ -5840,6 +5840,15 @@ class TestOpportunitiesDashboard(BaseApplicationTest):
                     'frameworkSlug': 'digital-outcomes-and-specialists-2'
                 },
                 'status': 'submitted',
+            },{
+                'briefId': 345,
+                'brief': {
+                    'title': 'First, live, ends in 7 days',
+                    'applicationsClosedAt': '2017-06-07T10:26:21.538917Z',
+                    'status': 'live',
+                    'frameworkSlug': 'digital-outcomes-and-specialists-2'
+                },
+                'status': 'draft',
             }
         ]}
 
@@ -5870,6 +5879,7 @@ class TestOpportunitiesDashboard(BaseApplicationTest):
             assert resp.status_code == 200
             data_api_client.find_brief_responses.assert_called_once_with(
                 supplier_id=1234,
+                status='submitted,draft',
                 framework='digital-outcomes-and-specialists-2'
             )
 
@@ -5934,3 +5944,7 @@ class TestOpportunitiesDashboard(BaseApplicationTest):
         assert 'View application' in first_row
         assert 'View application' not in second_row
         assert 'View application' in third_row
+
+    def test_started_opportunities_table(self, data_api_client):
+        first_row = self.get_table_rows_by_id('draft-opportunities', data_api_client)[0]
+        assert 'First, live, ends in 7 days' in first_row

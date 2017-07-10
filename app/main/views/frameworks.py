@@ -1204,11 +1204,15 @@ def opportunities_dashboard(framework_slug):
     if not (framework['framework'] == 'digital-outcomes-and-specialists' and supplier_framework['onFramework']):
         abort(404)
     opportunities = data_api_client.find_brief_responses(
-        supplier_id=current_user.supplier_id, framework=framework_slug
+        supplier_id=current_user.supplier_id, framework=framework_slug, status='submitted,draft'
     )['briefResponses']
+
+    draft_opportunities = [opportunity for opportunity in opportunities if opportunity["status"] == "draft"]
+    submitted_opportunities = [opportunity for opportunity in opportunities if opportunity["status"] == "submitted"]
 
     return render_template(
         "suppliers/opportunities_dashboard.html",
         framework=framework,
-        completed=opportunities
+        draft_opportunities=draft_opportunities,
+        submitted_opportunities=submitted_opportunities
     ), 200
