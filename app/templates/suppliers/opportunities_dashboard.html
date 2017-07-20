@@ -40,11 +40,11 @@
   </p>
 
 
-{{ summary.heading("Draft applications", id="draft-opportunities") }}
+{{ summary.heading("Applications you've started", id="draft-opportunities") }}
 {% call(item) summary.list_table(
     draft_opportunities|sort(attribute='brief.applicationsClosedAt'),
     caption="Draft applications",
-    empty_message="You haven’t applied to any opportunities",
+    empty_message="You haven’t started any applications",
     field_headings=[
         "Opportunity",
         "Closing date",
@@ -67,7 +67,7 @@
 {% call(item) summary.list_table(
     submitted_opportunities|sort(attribute='brief.applicationsClosedAt', reverse=True),
     caption="Applications you’ve made",
-    empty_message="You haven’t applied to any opportunities",
+    empty_message="You haven’t made any applications",
     field_headings=[
         "Opportunity",
         "Closing date",
